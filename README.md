@@ -1,4 +1,4 @@
-# lib-minkrestA
+# lib-minkrest
 
 [![GitHub CI/CD](https://github.com/nelkinda/lib-minkrest/workflows/CI/CD/badge.svg)](https://github.com/nelkinda/template-multi-gradle/actions)
 
