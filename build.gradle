@@ -1,0 +1,152 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+    dependencies {
+        classpath 'name.remal:gradle-plugins:1.0.194'
+        classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.0'
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.5.1'
+    }
+}
+
+plugins {
+    id 'name.remal.check-updates' version '1.0.194'
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+ext {
+    cucumberVersion = '6.1.1'
+    junitVersion = '4.13'
+    junitJupiterVersion = '5.6.2'
+    junitPlatformVersion = '1.6.2'
+    lombokVersion = '1.18.12'
+    mockitoVersion = '3.3.3'
+    pmdVersion = '6.24.0'
+}
+
+subprojects {
+    version '0.0.1-SNAPSHOT'
+}
+
+configure(subprojects) {
+    apply plugin: 'java'
+    apply plugin: 'checkstyle'
+    apply plugin: 'pmd'
+    apply plugin: 'jacoco'
+    apply plugin: 'name.remal.sonarlint'
+    apply plugin: 'org.sonarqube'
+    apply plugin: 'info.solidsoft.pitest'
+    apply plugin: 'name.remal.check-updates'
+
+    sourceCompatibility = 14
+
+    dependencies {
+        checkstyle 'com.puppycrawl.tools:checkstyle:8.33'
+
+        annotationProcessor "org.projectlombok:lombok:$rootProject.ext.lombokVersion"
+        compileOnly "org.projectlombok:lombok:$rootProject.ext.lombokVersion"
+
+        testAnnotationProcessor "org.projectlombok:lombok:$rootProject.ext.lombokVersion"
+        testCompileOnly "org.projectlombok:lombok:$rootProject.ext.lombokVersion"
+
+        testImplementation "io.cucumber:cucumber-java:$rootProject.ext.cucumberVersion"
+        testImplementation "io.cucumber:cucumber-junit:$rootProject.ext.cucumberVersion"
+        testImplementation "io.cucumber:cucumber-junit-platform-engine:$rootProject.ext.cucumberVersion"
+        testImplementation "junit:junit:$rootProject.ext.junitVersion"
+        testImplementation "org.junit.jupiter:junit-jupiter:$rootProject.ext.junitJupiterVersion"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:$rootProject.ext.junitJupiterVersion"
+        testImplementation "org.junit.jupiter:junit-jupiter-engine:$rootProject.ext.junitJupiterVersion"
+        testImplementation "org.junit.jupiter:junit-jupiter-params:$rootProject.ext.junitJupiterVersion"
+        testImplementation "org.junit.platform:junit-platform-commons:$rootProject.ext.junitPlatformVersion"
+        testImplementation "org.junit.platform:junit-platform-engine:$rootProject.ext.junitPlatformVersion"
+        testImplementation "org.junit.vintage:junit-vintage-engine:$rootProject.ext.junitJupiterVersion"
+        testImplementation "org.mockito:mockito-core:$rootProject.ext.mockitoVersion"
+
+        pitest 'org.pitest:pitest-junit5-plugin:0.12'
+        pitest 'org.pitest:pitest-command-line:1.5.2'
+    }
+
+    checkDependencyUpdates {
+        failIfUpdatesFound = true
+    }
+
+    checkstyleMain {
+        configFile = file("../config/checkstyle/checkstyleMain.xml")
+        maxWarnings = 0
+    }
+
+    checkstyleTest {
+        configFile = file("../config/checkstyle/checkstyleTest.xml")
+        maxWarnings = 0
+    }
+
+    jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                limit {
+                    minimum = 1.0
+                }
+            }
+        }
+    }
+    check.dependsOn jacocoTestCoverageVerification
+
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+            csv.enabled true
+            html.enabled true
+        }
+    }
+    test.finalizedBy jacocoTestReport
+
+    pitest {
+        targetClasses = ['com.nelkinda.template.*'] // TODO change
+        pitestVersion = '1.5.2'
+        timestampedReports = false
+        testPlugin = 'junit5'
+        outputFormats = ['XML', 'HTML']
+        mutators = ['DEFAULTS', 'STRONGER', 'CONSTRUCTOR_CALLS', 'INLINE_CONSTS', 'REMOVE_CONDITIONALS', 'REMOVE_INCREMENTS']
+        mutationThreshold = 100
+        coverageThreshold = 100
+    }
+
+    pmd {
+        ruleSets = []
+        consoleOutput = true
+        dependencies {
+            pmd "net.sourceforge.pmd:pmd:$rootProject.ext.pmdVersion"
+            pmd "net.sourceforge.pmd:pmd-core:$rootProject.ext.pmdVersion"
+            pmd "net.sourceforge.pmd:pmd-java:$rootProject.ext.pmdVersion"
+        }
+    }
+
+    pmdMain {
+        ruleSetFiles = files("../config/pmd/pmdMain.xml")
+    }
+
+    pmdTest {
+        ruleSetFiles = files("../config/pmd/pmdTest.xml")
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
+checkDependencyUpdates {
+    failIfUpdatesFound = true
+}
+
+wrapper {
+    gradleVersion '6.5'
+    distributionType = Wrapper.DistributionType.ALL
+}
