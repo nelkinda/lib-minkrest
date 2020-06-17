@@ -1,7 +1,6 @@
 # lib-minkrestA
 
-[![GitHub CI/CD](https://github.com/nelkinda/template-multi-gradle/workflows/CI/CD/badge.svg)](https://github.com/nelkinda/template-multi-gradle/actions)
-[![Travis CI/Cd](https://travis-ci.org/nelkinda/template-multi-gradle.svg)](https://travis-ci.org/nelkinda/template-multi-gradle)
+[![GitHub CI/CD](https://github.com/nelkinda/lib-minkrest/workflows/CI/CD/badge.svg)](https://github.com/nelkinda/template-multi-gradle/actions)
 
 Minimalistic lambda-based hamcrest-style matcher in Kotlin, also works for Java.
 Without the overhead of creating separate matchers.

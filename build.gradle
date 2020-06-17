@@ -112,7 +112,7 @@ configure(subprojects) {
     test.finalizedBy jacocoTestReport
 
     pitest {
-        targetClasses = ['com.nelkinda.template.*'] // TODO change
+        targetClasses = ['com.nelkinda.minkrest.*']
         pitestVersion = '1.5.2'
         timestampedReports = false
         testPlugin = 'junit5'
