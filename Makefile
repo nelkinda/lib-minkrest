@@ -14,6 +14,11 @@ pipeline:
 	$(BUILD) $(BUILDFLAGS) checkUpdates build
 	#$(BUILD) $(BUILDFLAGS) checkUpdates build pitest
 
+.PHONY: publish
+## Publishes the library to GitHub.
+publish:
+	$(BIULD) $(BUILDFLAGS) :lib-minkrest:publish
+
 .PHONY: continuous
 ## Builds and tests continuously.
 continuous:
